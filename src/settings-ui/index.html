@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <!--
+      Local page with a strict policy: no remote code at all. `file:` is listed
+      explicitly because a file-URL document has an opaque origin, so 'self'
+      alone would not match its own stylesheet and scripts.
+    -->
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'none'; img-src data:; style-src 'self' file:; script-src 'self' file:;"
+    />
+    <title>Настройки itirpc</title>
+    <link rel="stylesheet" href="index.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="brand">
+        <span class="brand-name">itirpc</span>
+        <span class="brand-version" id="version"></span>
+      </div>
+      <div class="topbar-actions">
+        <span class="saved" id="saved" hidden>Сохранено</span>
+        <button id="open-config" class="button" type="button">config.json</button>
+        <button id="open-logs" class="button" type="button">Логи</button>
+      </div>
+    </header>
+
+    <div class="layout">
+      <nav class="nav" id="nav" aria-label="Разделы настроек"></nav>
+      <main class="content" id="content"></main>
+    </div>
+
+    <script src="accelerator.js"></script>
+    <script src="schema.js"></script>
+    <script src="index.js"></script>
+  </body>
+</html>

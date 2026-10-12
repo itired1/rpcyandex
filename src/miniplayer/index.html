@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <!--
+      Local file with a strict policy: no remote scripts, and images only from
+      the Yandex CDN the client already uses for artwork. `file:` is listed
+      explicitly because a file-URL document has an opaque origin, so 'self'
+      alone would not match its own stylesheet and script.
+    -->
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'none'; img-src https://*.yandex.net data:; style-src 'self' file:; script-src 'self' file:;"
+    />
+    <title>itirpc mini player</title>
+    <link rel="stylesheet" href="index.css" />
+  </head>
+  <body>
+    <!--
+      `data-density` is written by the renderer from a ResizeObserver, not by a
+      media query: one place decides how much fits, and the stylesheet only
+      reacts. Sizes inside a density are continuous (clamp + container units).
+    -->
+    <main id="root" class="player" data-density="comfortable" data-state="idle">
+      <div class="cover">
+        <img id="cover" alt="" />
+        <div class="cover-fallback" aria-hidden="true">♪</div>
+      </div>
+
+      <div class="meta">
+        <div id="title" class="title">Ничего не играет</div>
+        <div class="subline">
+          <span id="artist" class="artist"></span>
+          <span id="codec" class="codec" hidden></span>
+        </div>
+
+        <div class="controls">
+          <button id="prev" class="button" type="button" title="Предыдущий трек" aria-label="Предыдущий трек">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M19 20 9 12l10-8z" />
+              <path d="M5 5v14" />
+            </svg>
+          </button>
+          <button id="toggle" class="button button-primary" type="button" title="Играть/пауза" aria-label="Играть или пауза">
+            <svg id="icon-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4l13 8-13 8z" /></svg>
+            <svg id="icon-pause" viewBox="0 0 24 24" aria-hidden="true" hidden><path d="M7 4h4v16H7zM13 4h4v16h-4z" /></svg>
+          </button>
+          <button id="next" class="button" type="button" title="Следующий трек" aria-label="Следующий трек">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M5 4l10 8-10 8z" />
+              <path d="M19 5v14" />
+            </svg>
+          </button>
+
+          <div class="spacer"></div>
+
+          <div class="volume" role="group" aria-label="Громкость">
+            <button id="volumeDown" class="button" type="button" title="Тише" aria-label="Уменьшить громкость">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M11 5 6.5 9H3v6h3.5L11 19z" />
+                <path d="M15 9.5a3.5 3.5 0 0 1 0 5" />
+              </svg>
+            </button>
+            <button id="volumeUp" class="button" type="button" title="Громче" aria-label="Увеличить громкость">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M11 5 6.5 9H3v6h3.5L11 19z" />
+                <path d="M15 9.5a3.5 3.5 0 0 1 0 5" />
+                <path d="M17.5 7a7 7 0 0 1 0 10" />
+              </svg>
+            </button>
+          </div>
+
+          <button id="pin" class="button" type="button" title="Поверх всех окон" aria-label="Поверх всех окон" aria-pressed="true">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M12 21s7-6.1 7-11a7 7 0 1 0-14 0c0 4.9 7 11 7 11z" />
+              <circle cx="12" cy="10" r="2.5" />
+            </svg>
+          </button>
+          <button id="close" class="button" type="button" title="Скрыть мини-плеер" aria-label="Скрыть мини-плеер">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12" /></svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="progress" id="progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+        <div class="progress-track"></div>
+        <div class="progress-fill" id="progressFill"></div>
+      </div>
+      <div class="time">
+        <span id="elapsed">0:00</span>
+        <span id="duration">0:00</span>
+      </div>
+    </main>
+
+    <script src="index.js"></script>
+  </body>
+</html>

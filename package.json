@@ -1,0 +1,26 @@
+{
+  "name": "itirpc",
+  "version": "0.1.0",
+  "private": true,
+  "description": "itirpc — модификация десктопного клиента Яндекс.Музыки: Discord Rich Presence, Last.fm, мини-плеер и исправления ванильного клиента",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "info": "node toolset.js info",
+    "unpack": "node toolset.js unpack",
+    "build": "node toolset.js build",
+    "build:min": "node toolset.js build --minify",
+    "patch": "node toolset.js patch",
+    "install:mod": "node toolset.js install",
+    "restore": "node toolset.js restore",
+    "doctor": "node toolset.js doctor",
+    "verify": "node toolset.js verify",
+    "run": "node toolset.js run",
+    "dev": "node toolset.js rebuild",
+    "test": "node scripts/run-tests.mjs"
+  },
+  "dependencies": {},
+  "devDependencies": {}
+}

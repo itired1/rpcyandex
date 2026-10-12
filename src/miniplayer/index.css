@@ -1,0 +1,440 @@
+/*
+ * itirpc mini player styles.
+ *
+ * Two independent mechanisms, on purpose:
+ *
+ *  - **Continuous.** Every length is a `clamp()` over container query units, so
+ *    dragging a window edge continuously resizes the artwork, the buttons and
+ *    the type instead of jumping between fixed breakpoints.
+ *  - **Discrete.** Some things cannot be continuous — you either show the
+ *    artwork or you do not. Those tiers are chosen by the renderer from a
+ *    `ResizeObserver` and published as `data-density` on the root, so the
+ *    thresholds live in exactly one place (index.js) and this file only reacts.
+ */
+
+:root {
+  color-scheme: dark light;
+  --bg: #16181c;
+  --bg-elevated: #242831;
+  --bg-hover: #2e333e;
+  --text: #f5f6f8;
+  --text-dim: #9aa2b1;
+  --accent: #ffcc00;
+  --progress-track: #333947;
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    --bg: #f6f7f9;
+    --bg-elevated: #ffffff;
+    --bg-hover: #e9ecf1;
+    --text: #14161a;
+    --text-dim: #6b7280;
+    --progress-track: #d7dce5;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--text);
+  font: 13px/1.35 "Segoe UI", system-ui, -apple-system, sans-serif;
+  user-select: none;
+}
+
+.player {
+  /* The whole layout scales from this one query container. */
+  container-type: size;
+  container-name: player;
+
+  /* The whole layout scales from this one query container.
+ *
+ * Square things (buttons, artwork, glyphs) are sized over `cqmin`, because a
+ * square has to fit both axes and the window can be dragged to 200x72. Sizing
+ * them from `cqi` alone let a narrow, tall window grow buttons that no longer
+ * fitted across; sizing them from `cqb` alone did the same vertically. Note the
+ * coefficient is large on purpose: at the default 340x132 one `cqmin` unit is
+ * only ~1.32px, the short axis of the window.
+ *
+ * Text and horizontal padding use `cqi`: type must not shrink just because the
+ * window is short. The upper bounds are set so the minimal tier still fits the
+ * 200px width floor. */
+  --pad-x: clamp(8px, 3cqi, 16px);
+  --pad-y: clamp(4px, 8cqb, 12px);
+  --gap: clamp(3px, 3cqb, 10px);
+  --btn-gap: clamp(2px, 1.6cqmin, 4px);
+  /* Bounded by width as well as height: the artwork grows with the short axis,
+     but at the comfortable threshold there is only ~330px of width and the seven
+     controls need ~240 of it, so an 80px cover would push the row past the edge. */
+  --cover: min(clamp(34px, 40cqmin, 80px), 16cqi);
+  --radius: clamp(5px, 4cqmin, 14px);
+  --btn: clamp(21px, 19cqmin, 27px);
+  --btn-primary: clamp(27px, 25cqmin, 36px);
+  --icon: clamp(13px, 11cqmin, 19px);
+  --icon-primary: clamp(16px, 14cqmin, 24px);
+  /* The upper bounds are deliberately low. Type is the one length that grows
+     with width, so an uncapped scale made a wide window need more height than a
+     narrow one and pushed it into a denser tier for no visual gain. */
+  --fs-title: clamp(11px, 4cqi, 14px);
+  --fs-meta: clamp(10px, 3.4cqi, 12.5px);
+  --fs-tiny: clamp(9px, 2.8cqi, 11px);
+  --fs-badge: clamp(8px, 2.4cqi, 10px);
+  --bar: clamp(3px, 1.2cqb, 5px);
+  --bar-active: clamp(6px, 2.2cqb, 9px);
+
+  position: relative;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  /* minmax(0, ...) on the flexible row and column is what lets a too-small
+     window shrink content instead of overflowing past `overflow: hidden`. */
+  grid-template-rows: minmax(0, 1fr) auto auto;
+  grid-template-areas:
+    "cover meta"
+    "progress progress"
+    "time time";
+  gap: var(--gap);
+  height: 100%;
+  padding: var(--pad-y) var(--pad-x);
+  -webkit-app-region: drag;
+}
+
+/* --- artwork ------------------------------------------------------------ */
+
+.cover {
+  grid-area: cover;
+  position: relative;
+  width: var(--cover);
+  height: var(--cover);
+  min-height: 0;
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: var(--bg-elevated);
+  align-self: center;
+  transition: transform 160ms ease;
+}
+
+/* Deliberately barely-there: enough to feel alive, not enough to distract. */
+.player:hover .cover {
+  transform: scale(1.04);
+}
+
+.cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.cover img[data-empty="true"] {
+  display: none;
+}
+
+.cover-fallback {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-size: calc(var(--cover) * 0.38);
+  color: var(--text-dim);
+}
+
+.cover img:not([data-empty="true"]) + .cover-fallback {
+  display: none;
+}
+
+/* --- metadata and controls --------------------------------------------- */
+
+.meta {
+  grid-area: meta;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+  min-height: 0;
+  gap: 1px;
+  overflow: hidden;
+}
+
+.title {
+  font-weight: 600;
+  font-size: var(--fs-title);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.subline {
+  display: flex;
+  align-items: center;
+  gap: var(--gap);
+  min-width: 0;
+}
+
+.artist {
+  color: var(--text-dim);
+  font-size: var(--fs-meta);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+
+/* Codec/bitrate badge: informative but must never push the title around. */
+.codec {
+  flex: none;
+  padding: 0 clamp(3px, 0.8cqi, 6px);
+  border-radius: calc(var(--radius) * 0.5);
+  background: var(--bg-elevated);
+  color: var(--text-dim);
+  font-size: var(--fs-badge);
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  font-variant-numeric: tabular-nums;
+}
+
+.codec[hidden] {
+  display: none;
+}
+
+.player[data-state="idle"] .artist,
+.player[data-state="idle"] .codec,
+.player[data-state="idle"] .subline {
+  display: none;
+}
+
+.controls {
+  display: flex;
+  align-items: center;
+  gap: var(--btn-gap);
+  margin-top: var(--btn-gap);
+  -webkit-app-region: no-drag;
+}
+
+.spacer {
+  flex: 1;
+  min-width: 0;
+}
+
+.volume {
+  display: flex;
+  align-items: center;
+  gap: var(--btn-gap);
+  padding-inline-end: var(--btn-gap);
+  margin-inline-end: var(--btn-gap);
+  border-inline-end: 1px solid var(--progress-track);
+}
+
+.button {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: var(--btn);
+  height: var(--btn);
+  padding: 0;
+  border: 0;
+  border-radius: calc(var(--radius) * 0.7);
+  background: transparent;
+  color: var(--text);
+  cursor: pointer;
+  transition: background 120ms ease, color 120ms ease, opacity 120ms ease;
+}
+
+/* Outline icons: stroked paths, filled triangles for play/pause. */
+.button svg {
+  width: var(--icon);
+  height: var(--icon);
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+#icon-play,
+#icon-pause {
+  fill: currentColor;
+  stroke: none;
+}
+
+.button:hover {
+  background: var(--bg-hover);
+}
+
+.button:active {
+  transform: scale(0.92);
+}
+
+.button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+/*
+ * The primary button used to be a filled yellow disc with a black glyph, which
+ * pulled the eye away from the artwork. It is now a neutral, high-contrast
+ * target and the accent survives only on the progress bar and focus rings.
+ */
+.button-primary {
+  width: var(--btn-primary);
+  height: var(--btn-primary);
+  background: var(--bg-elevated);
+  color: var(--text);
+}
+
+.button-primary svg {
+  width: var(--icon-primary);
+  height: var(--icon-primary);
+}
+
+.button-primary:hover {
+  background: var(--bg-hover);
+}
+
+.button[disabled] {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.button[aria-pressed="false"] {
+  opacity: 0.5;
+}
+
+/* --- progress ----------------------------------------------------------- */
+
+/*
+ * The bar is a thin line inside a tall hit area, and grows on hover. At the old
+ * 3px the whole element was the click target, which made seeking fiddly.
+ */
+.progress {
+  grid-area: progress;
+  position: relative;
+  height: clamp(10px, 11cqb, 20px);
+  cursor: pointer;
+  -webkit-app-region: no-drag;
+}
+
+.progress-track,
+.progress-fill {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  height: var(--bar);
+  margin-top: calc(var(--bar) / -2);
+  border-radius: 99px;
+  transition: height 140ms ease, margin-top 140ms ease;
+}
+
+.progress-track {
+  right: 0;
+  background: var(--progress-track);
+}
+
+.progress-fill {
+  width: 0%;
+  background: var(--accent);
+  transition: width 250ms linear, height 140ms ease, margin-top 140ms ease;
+}
+
+.progress:hover .progress-track,
+.progress:hover .progress-fill,
+.progress:focus-visible .progress-track,
+.progress:focus-visible .progress-fill {
+  height: var(--bar-active);
+  margin-top: calc(var(--bar-active) / -2);
+}
+
+.progress:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.progress[hidden] {
+  visibility: hidden;
+}
+
+.player[data-state="paused"] .progress-fill {
+  opacity: 0.6;
+}
+
+.time {
+  grid-area: time;
+  display: flex;
+  justify-content: space-between;
+  font-size: var(--fs-tiny);
+  color: var(--text-dim);
+  font-variant-numeric: tabular-nums;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* --- density tiers ------------------------------------------------------ */
+
+/*
+ * Thresholds live in index.js (densityFor, called from the ResizeObserver);
+ * these rules only describe what each tier drops. `comfortable` is the base
+ * layout above.
+ *
+ * A tier that hides the time row must also drop the grid row for it: `gap`
+ * applies between explicit rows whether or not they hold anything, so leaving
+ * `"time"` in place would spend a gap on empty space.
+ */
+
+/* No room for artwork or for the second line: title, controls, bar. */
+.player[data-density="minimal"] {
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas:
+    "meta"
+    "progress";
+}
+
+.player[data-density="minimal"] .cover,
+.player[data-density="minimal"] .subline,
+.player[data-density="minimal"] .time,
+.player[data-density="minimal"] .volume {
+  display: none;
+}
+
+/* No room for artwork, but metadata and times still fit. */
+.player[data-density="compact"] {
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas:
+    "meta"
+    "progress"
+    "time";
+}
+
+.player[data-density="compact"] .cover,
+.player[data-density="compact"] .volume {
+  display: none;
+}
+
+/* Short but wide: keep the artwork, drop the times and the volume steps. */
+.player[data-density="short"] {
+  grid-template-areas:
+    "cover meta"
+    "progress";
+}
+
+.player[data-density="short"] .time,
+.player[data-density="short"] .volume {
+  display: none;
+}
+
+/* Motion is decoration; respect the OS preference. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 1ms !important;
+    animation-duration: 1ms !important;
+  }
+}
