@@ -288,6 +288,10 @@ function main() {
       }),
   );
 
+  if (miniPlayer && settingsWindow) {
+    miniPlayer.onOpenSettings = () => settingsWindow.show();
+  }
+
   presence = guard(
     'discord',
     () =>
@@ -346,6 +350,7 @@ function main() {
         player,
         miniPlayer,
         zoom,
+        settingsWindow,
         logger: loggerModule.create('Hotkeys'),
       }),
   );

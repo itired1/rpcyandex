@@ -58,6 +58,8 @@ const DEFAULT_SETTINGS = {
     volumeDown: 'Control+Down',
     /** Opens the mini player. Ctrl+Shift+M is Discord's mute shortcut. */
     miniPlayer: 'Control+Alt+M',
+    /** Opens the itirpc settings window. */
+    settings: 'Control+Alt+S',
     /** Application zoom, mirroring the browser conventions. */
     zoomIn: 'Control+=',
     zoomOut: 'Control+-',
@@ -66,8 +68,13 @@ const DEFAULT_SETTINGS = {
   ui: {
     /** Persisted zoom factor, 1 = 100 %. */
     zoom: 1,
-    /** Adds a separate itirpc icon next to the client's own tray icon. */
-    trayIcon: true,
+    /**
+     * Adds a separate itirpc icon next to the client's own tray icon.
+     *
+     * Off by default so the tray shows a single Yandex Music icon; the settings
+     * window is reached with the Ctrl+Alt+S hotkey or the mini player's gear.
+     */
+    trayIcon: false,
     /** Show the current stream codec in the mini player. */
     showCodec: true,
   },

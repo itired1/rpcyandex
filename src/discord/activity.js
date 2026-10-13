@@ -12,7 +12,7 @@
 const ACTIVITY_TYPE_LISTENING = 2;
 const DISCORD_STRING_LIMIT = 128;
 /** U+23F8 + variation selector, so Discord renders the pause glyph as emoji. */
-const PAUSE_GLYPH = '\u23F8\uFE0F';
+const PAUSE_GLYPH = '';
 
 const STRINGS = {
   ru: {
@@ -70,7 +70,7 @@ function searchUrl(state) {
  * progress bar that keeps advancing.
  */
 function pickSecondaryText(state, displayType, strings) {
-  if (!state.isPlaying) return `${PAUSE_GLYPH}\u00A0${strings.paused}`;
+  if (!state.isPlaying) return strings.paused;
   switch (displayType) {
     case 'album':
       return state.album || state.artist;
@@ -112,6 +112,12 @@ function buildActivity(state, config, locale) {
   }
 
   const assets = {};
+    if (config.smallImageKey) {
+    assets.small_image = config.smallImageKey;
+    assets.small_text = toDiscordString(
+      state.isPlaying ? strings.listening : strings.paused,
+    );
+  }
   if (state.coverUrl) {
     // External https assets are proxied by Discord, so no upload is needed.
     assets.large_image = state.coverUrl;
@@ -119,13 +125,7 @@ function buildActivity(state, config, locale) {
     // `album` as the track title, so the line below the artwork printed the
     // words above it a second time instead of adding anything.
   }
-  if (config.smallImageKey) {
-    assets.small_image = config.smallImageKey;
-    assets.small_text = toDiscordString(
-      state.isPlaying ? strings.listening : strings.paused,
-    );
-  }
-  if (Object.keys(assets).length) activity.assets = assets;
+    if (Object.keys(assets).length) activity.assets = assets;
 
   if (config.showButtons) {
     const url = searchUrl(state);
@@ -167,9 +167,6 @@ function activitiesEqual(a, b) {
     a.type === b.type &&
     a.assets?.large_image === b.assets?.large_image &&
     a.assets?.large_text === b.assets?.large_text &&
-    a.assets?.small_image === b.assets?.small_image &&
-    a.assets?.small_text === b.assets?.small_text &&
-    a.buttons?.[0]?.url === b.buttons?.[0]?.url &&
     Boolean(a.timestamps) === Boolean(b.timestamps)
   );
 }

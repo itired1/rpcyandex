@@ -19,6 +19,7 @@ const ACTIONS = {
 /** Actions handled by the mod itself; they receive the manager as context. */
 const MOD_ACTIONS = {
   miniPlayer: (context) => context.miniPlayer?.toggle(),
+  settings: (context) => context.settingsWindow?.toggle(),
   zoomIn: (context) => context.zoom?.zoomIn(),
   zoomOut: (context) => context.zoom?.zoomOut(),
   zoomReset: (context) => context.zoom?.reset(),

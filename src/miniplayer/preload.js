@@ -51,6 +51,7 @@ electron.contextBridge.exposeInMainWorld('itirpcMini', {
       'seek',
       'togglePin',
       'hide',
+      'openSettings',
     ];
     if (!allowed.includes(command?.action)) {
       throw new Error(`itirpcMini: unknown command "${command?.action}"`);

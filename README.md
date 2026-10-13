@@ -333,7 +333,7 @@ node toolset.js config lastfm.sharedSecret  <SHARED_SECRET>
   },
   "ui": {
     "zoom": 1,                 // сохраняется автоматически
-    "trayIcon": true,
+    "trayIcon": false,
     "showCodec": true          // бейдж кодека в мини-плеере
   },
   "miniplayer": {

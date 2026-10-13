@@ -16,11 +16,12 @@ const electron = require('electron');
 const { ACTIONS, MOD_ACTIONS, isDisabled, pickAccelerators } = require('./hotkey-definitions');
 
 class HotkeyManager {
-  constructor({ settings, player, logger, miniPlayer, onChange }) {
+  constructor({ settings, player, logger, miniPlayer, settingsWindow, onChange }) {
     this.settings = settings;
     this.player = player;
     this.logger = logger;
     this.miniPlayer = miniPlayer;
+    this.settingsWindow = settingsWindow;
     this.onChange = onChange;
     this.registered = new Map();
     this.enabled = false;

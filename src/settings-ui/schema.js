@@ -141,6 +141,7 @@ const SECTIONS = [
       { path: 'hotkeys.volumeUp', type: FIELD_TYPES.HOTKEY, label: 'Громче' },
       { path: 'hotkeys.volumeDown', type: FIELD_TYPES.HOTKEY, label: 'Тише' },
       { path: 'hotkeys.miniPlayer', type: FIELD_TYPES.HOTKEY, label: 'Мини-плеер' },
+      { path: 'hotkeys.settings', type: FIELD_TYPES.HOTKEY, label: 'Настройки' },
       { path: 'hotkeys.zoomIn', type: FIELD_TYPES.HOTKEY, label: 'Масштаб: крупнее' },
       { path: 'hotkeys.zoomOut', type: FIELD_TYPES.HOTKEY, label: 'Масштаб: мельче' },
       { path: 'hotkeys.zoomReset', type: FIELD_TYPES.HOTKEY, label: 'Масштаб: сброс' },

@@ -14,26 +14,26 @@
  */
 
 const api = window.itirpcMini;
-const elements = {
-  root: document.getElementById('root'),
-  cover: document.getElementById('cover'),
-  title: document.getElementById('title'),
-  artist: document.getElementById('artist'),
-  codec: document.getElementById('codec'),
-  elapsed: document.getElementById('elapsed'),
-  duration: document.getElementById('duration'),
-  progress: document.getElementById('progress'),
-  progressFill: document.getElementById('progressFill'),
-  toggle: document.getElementById('toggle'),
-  iconPlay: document.getElementById('icon-play'),
-  iconPause: document.getElementById('icon-pause'),
-  prev: document.getElementById('prev'),
-  next: document.getElementById('next'),
-  volumeUp: document.getElementById('volumeUp'),
-  volumeDown: document.getElementById('volumeDown'),
-  pin: document.getElementById('pin'),
-  close: document.getElementById('close'),
-};
+  const elements = {
+    root: document.getElementById('root'),
+    cover: document.getElementById('cover'),
+    coverFallback: document.querySelector('.cover-fallback'),
+    title: document.getElementById('title'),
+    artist: document.getElementById('artist'),
+    codec: document.getElementById('codec'),
+    prev: document.getElementById('prev'),
+    toggle: document.getElementById('toggle'),
+    next: document.getElementById('next'),
+    volumeDown: document.getElementById('volumeDown'),
+    volumeUp: document.getElementById('volumeUp'),
+    settings: document.getElementById('settings'),
+    pin: document.getElementById('pin'),
+    close: document.getElementById('close'),
+    progress: document.getElementById('progress'),
+    progressFill: document.getElementById('progressFill'),
+    elapsed: document.getElementById('elapsed'),
+    duration: document.getElementById('duration'),
+  };
 
 const EMPTY_TITLE = 'Ничего не играет';
 
@@ -228,8 +228,9 @@ elements.prev.addEventListener('click', () => api.control({ action: 'previous' }
 elements.next.addEventListener('click', () => api.control({ action: 'next' }));
 elements.volumeUp.addEventListener('click', () => api.control({ action: 'volumeUp' }));
 elements.volumeDown.addEventListener('click', () => api.control({ action: 'volumeDown' }));
-elements.pin.addEventListener('click', () => api.control({ action: 'togglePin' }));
-elements.close.addEventListener('click', () => api.control({ action: 'hide' }));
+  elements.pin.addEventListener('click', () => api.control({ action: 'togglePin' }));
+  elements.close.addEventListener('click', () => api.control({ action: 'hide' }));
+  elements.settings.addEventListener('click', () => api.control({ action: 'openSettings' }));
 
 elements.progress.addEventListener('click', (event) => {
   const duration = state.duration;

@@ -33,11 +33,12 @@ const MIN_HEIGHT = 72;
 const CHROME_BG = { dark: '#16181c', light: '#f6f7f9' };
 
 class MiniPlayer {
-  constructor({ settings, player, zoom, logger }) {
+  constructor({ settings, player, zoom, logger, onOpenSettings }) {
     this.settings = settings;
     this.player = player;
     this.zoom = zoom;
     this.logger = logger;
+    this.onOpenSettings = onOpenSettings;
     this.window = null;
     this.ready = false;
     this.boundIpc = false;
@@ -253,6 +254,9 @@ class MiniPlayer {
       }
       case 'hide':
         this.hide();
+        break;
+      case 'openSettings':
+        if (this.onOpenSettings) this.onOpenSettings();
         break;
       default:
         this.logger.warn('Unknown mini player command:', command);

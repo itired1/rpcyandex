@@ -303,6 +303,15 @@ body {
   cursor: default;
 }
 
+.button-gear {
+  position: absolute;
+  top: var(--pad-y);
+  right: var(--pad-x);
+  width: var(--btn);
+  height: var(--btn);
+  padding: clamp(1px, 1cqi, 2px);
+}
+
 .button[aria-pressed="false"] {
   opacity: 0.5;
 }
@@ -399,7 +408,8 @@ body {
 .player[data-density="minimal"] .cover,
 .player[data-density="minimal"] .subline,
 .player[data-density="minimal"] .time,
-.player[data-density="minimal"] .volume {
+.player[data-density="minimal"] .volume,
+.player[data-density="minimal"] .button-gear {
   display: none;
 }
 
